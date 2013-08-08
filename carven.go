@@ -46,10 +46,8 @@ func main() {
 	}
 
 	for key, value := range v {
-		if len(value) > 1000 {
+		if len(value) > 2000 {
 			fmt.Println(key, value)
 		}
 	}
-
-	fmt.Println("Goodnight. Ding-ding-ding-ding-ding- ding-ding-ding.")
 }
