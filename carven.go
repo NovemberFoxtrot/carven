@@ -2,10 +2,11 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"runtime"
 	"strings"
+  "fmt"
+  "math"
 )
 
 func main() {
@@ -13,7 +14,8 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
-	s := make(map[string]int, 0)
+	s := make(map[string]int)
+	v := make(map[string]map[string]int)
 
 	for scanner.Scan() {
 		somestring := scanner.Text()
@@ -29,25 +31,31 @@ func main() {
 		}
 	}
 
-	v := make(map[string]map[string]int)
-
 	for key, value := range s {
 		keys := strings.Split(key, "##")
 
-		v[keys[0]] = make(map[string]int)
+    if v[keys[0]] == nil {
+		  v[keys[0]] = make(map[string]int)
 
-		v[keys[0]][keys[0]] = value
-	}
+      // think about this one
+		  // v[keys[0]][keys[0]] = value
+    } else {
+		  keys := strings.Split(key, "##")
 
-	for key, value := range s {
-		keys := strings.Split(key, "##")
-
-		v[keys[0]][keys[1]] = value
+		  v[keys[0]][keys[1]] = value
+    }
 	}
 
 	for key, value := range v {
-		if len(value) > 2000 {
-			fmt.Println(key, value)
-		}
-	}
+    dotproduct := 0
+    magnitude := 0
+
+    for subkey, subvalue := range value {
+      // fmt.Println(key, subkey)
+      magnitude += subvalue * subvalue
+      dotproduct *= subvalue
+    }
+    fmt.Println(dotproduct, math.Sqrt(float64(magnitude)))
+  }
+  fmt.Println(v)
 }
