@@ -11,6 +11,9 @@ import (
 	"strings"
 )
 
+type ParseData map[string]int
+type MultiSetData map[string]map[string]int
+
 func CalcDotProduct(v1, v2 []float64) float64 {
 	result := 0.0
 
@@ -96,22 +99,24 @@ func Parse(s ParseData) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() {
-		somestring := scanner.Text()
+		somestring := CleanString(scanner.Text())
 
-		somestring = CleanString(somestring)
+		if len(somestring) == 0 {
+			continue
+		}
 
-		if len(somestring) > 0 {
-			t := strings.Split(somestring, " ")
+		t := strings.Split(somestring, " ")
 
-			if len(t) > 1 {
-				for i := 0; i < (len(t) - 1); i++ {
-					k1 := t[i] + "##" + t[i+1]
-					k2 := t[i+1] + "##" + t[i]
+		if len(t) <= 1 {
+			continue
+		}
 
-					s[k1] += 1
-					s[k2] += 1
-				}
-			}
+		for i := 0; i < (len(t) - 1); i++ {
+			k1 := t[i] + "##" + t[i+1]
+			k2 := t[i+1] + "##" + t[i]
+
+			s[k1] += 1
+			s[k2] += 1
 		}
 	}
 }
@@ -124,15 +129,11 @@ func BuildMultiSet(s ParseData, v MultiSetData) {
 			v[keys[0]] = make(map[string]int)
 		} else {
 			keys := strings.Split(key, "##")
-
 			v[keys[0]][keys[1]] = value
 		}
 
 	}
 }
-
-type ParseData map[string]int
-type MultiSetData map[string]map[string]int
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -143,19 +144,19 @@ func main() {
 	Parse(p)
 	BuildMultiSet(p, m)
 
-	var v1 []float64
-	var v2 []float64
-	var cosign float64
-	var innerkey string
-	var outerkey string
-	var innervalue map[string]int
-	var outervalue map[string]int
+  var keys []string
 
-	for outerkey, outervalue = range m {
-		for innerkey, innervalue = range m {
-			v1, v2 = BuildVector(outerkey, innerkey, outervalue, innervalue)
+	if len(os.Args) > 1 {
+    keys = os.Args[1:]
+  }
 
-			if cosign = CalcCosim(v1, v2); cosign > 0.8 {
+	// for outerkey, outervalue := range m {
+	for _, outerkey := range keys {
+		for innerkey, innervalue := range m {
+			// v1, v2 := BuildVector(outerkey, innerkey, outervalue, innervalue)
+			v1, v2 := BuildVector(outerkey, innerkey, m[outerkey], innervalue)
+
+			if cosign := CalcCosim(v1, v2); cosign > 0.78 {
 				fmt.Println(outerkey, innerkey, "\t\t", math.Floor(cosign*100))
 			}
 		}
