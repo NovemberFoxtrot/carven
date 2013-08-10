@@ -140,15 +140,18 @@ func main() {
 
 	p := make(ParseData)
 	m := make(MultiSetData)
-
+	fmt.Println("GOing to parse")
 	Parse(p)
+	fmt.Println("GOing to build multi set")
 	BuildMultiSet(p, m)
 
-  var keys []string
+	var keys []string
 
 	if len(os.Args) > 1 {
-    keys = os.Args[1:]
-  }
+		keys = os.Args[1:]
+	}
+
+	fmt.Println("GOing to find any matches")
 
 	// for outerkey, outervalue := range m {
 	for _, outerkey := range keys {
