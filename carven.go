@@ -39,10 +39,8 @@ func CalcMagnitude(v []float64) float64 {
 }
 
 func BuildVector(outerkey, innerkey string, outervalue, innervalue map[string]int) ([]float64, []float64) {
-	maxlength := len(outervalue) * len(innervalue)
-
-	outervector := make([]float64, 0, maxlength)
-	innervector := make([]float64, 0, maxlength)
+	outervector := make([]float64, 0)
+	innervector := make([]float64, 0)
 
 	commonkeys := make(map[string]bool)
 
