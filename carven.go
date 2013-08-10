@@ -95,7 +95,7 @@ func CleanString(s string) string {
 	return safe
 }
 
-func Parse(s ParseData) {
+func Parse(m MultiSetData) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() {
@@ -112,38 +112,27 @@ func Parse(s ParseData) {
 		}
 
 		for i := 0; i < (len(t) - 1); i++ {
-			k1 := t[i] + "##" + t[i+1]
-			k2 := t[i+1] + "##" + t[i]
+			if m[t[i]] == nil {
+				m[t[i]] = make(map[string]int)
+			}
+			m[t[i]][t[i+1]] += 1
 
-			s[k1] += 1
-			s[k2] += 1
+			if m[t[i+1]] == nil {
+				m[t[i+1]] = make(map[string]int)
+			}
+			m[t[i+1]][t[i]] += 1
 		}
-	}
-}
-
-func BuildMultiSet(s ParseData, v MultiSetData) {
-	for key, value := range s {
-		keys := strings.Split(key, "##")
-
-		if v[keys[0]] == nil {
-			v[keys[0]] = make(map[string]int)
-		} else {
-			keys := strings.Split(key, "##")
-			v[keys[0]][keys[1]] = value
-		}
-
 	}
 }
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	p := make(ParseData)
 	m := make(MultiSetData)
+
 	fmt.Println("GOing to parse")
-	Parse(p)
-	fmt.Println("GOing to build multi set")
-	BuildMultiSet(p, m)
+
+	Parse(m)
 
 	var keys []string
 
@@ -153,10 +142,8 @@ func main() {
 
 	fmt.Println("GOing to find any matches")
 
-	// for outerkey, outervalue := range m {
 	for _, outerkey := range keys {
 		for innerkey, innervalue := range m {
-			// v1, v2 := BuildVector(outerkey, innerkey, outervalue, innervalue)
 			v1, v2 := BuildVector(outerkey, innerkey, m[outerkey], innervalue)
 
 			if cosign := CalcCosim(v1, v2); cosign > 0.78 {
