@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+	"runtime/pprof"
 	"strings"
 )
 
@@ -80,7 +81,7 @@ func CalcCosim(v1, v2 []float64) float64 {
 }
 
 func CleanString(s string) string {
-	reg, err := regexp.Compile("[^A-Za-z0-9 ]+")
+	reg, err := regexp.Compile("[^A-Za-z ]+")
 
 	if err != nil {
 		log.Fatal(err)
@@ -125,6 +126,13 @@ func Parse(m MultiSetData) {
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	f, err := os.Create("carvan.prof")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
 
 	m := make(MultiSetData)
 
