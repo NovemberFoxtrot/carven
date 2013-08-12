@@ -127,16 +127,18 @@ func Parse(m MultiSetData) {
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	f, err := os.Create("carvan.prof")
+	f, err := os.Create("runtime.prof")
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	pprof.StartCPUProfile(f)
 	defer pprof.StopCPUProfile()
 
 	m := make(MultiSetData)
 
-	fmt.Println("GOing to parse")
+	fmt.Println("Parsing...")
 
 	Parse(m)
 
@@ -146,14 +148,14 @@ func main() {
 		keys = os.Args[1:]
 	}
 
-	fmt.Println("GOing to find any matches")
+	fmt.Println("Calculating...")
 
 	for _, outerkey := range keys {
 		for innerkey, innervalue := range m {
 			v1, v2 := BuildVector(outerkey, innerkey, m[outerkey], innervalue)
 
 			if cosign := CalcCosim(v1, v2); cosign > 0.78 {
-				fmt.Println(outerkey, innerkey, "\t\t", math.Floor(cosign*100))
+				fmt.Println(math.Floor(cosign*100), "\t", outerkey, innerkey)
 			}
 		}
 	}
